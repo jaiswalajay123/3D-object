@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Room Object Movement</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Room dimensions
+        const roomSize = 100;
+
+        // Create room (a simple box)
+        const roomGeometry = new THREE.BoxGeometry(roomSize, roomSize, roomSize);
+        const roomMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.BackSide });
+        const room = new THREE.Mesh(roomGeometry, roomMaterial);
+        scene.add(room);
+
+        // Create object (a cube)
+        const objectSize = 10;
+        const objectGeometry = new THREE.BoxGeometry(objectSize, objectSize, objectSize);
+        const objectMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const object = new THREE.Mesh(objectGeometry, objectMaterial);
+        object.position.set(0, 0, 0);
+        scene.add(object);
+
+        // Set camera position
+        camera.position.z = 150;
+
+        // Movement speed
+        const moveSpeed = 1;
+
+        // Key press state
+        const keyState = {};
+
+        window.addEventListener('keydown', (event) => {
+            keyState[event.code] = true;
+        });
+
+        window.addEventListener('keyup', (event) => {
+            keyState[event.code] = false;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Move object based on key press
+            if (keyState['ArrowUp'] && object.position.z - moveSpeed > -roomSize / 2 + objectSize / 2) {
+                object.position.z -= moveSpeed;
+            }
+            if (keyState['ArrowDown'] && object.position.z + moveSpeed < roomSize / 2 - objectSize / 2) {
+                object.position.z += moveSpeed;
+            }
+            if (keyState['ArrowLeft'] && object.position.x - moveSpeed > -roomSize / 2 + objectSize / 2) {
+                object.position.x -= moveSpeed;
+            }
+            if (keyState['ArrowRight'] && object.position.x + moveSpeed < roomSize / 2 - objectSize / 2) {
+                object.position.x += moveSpeed;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
